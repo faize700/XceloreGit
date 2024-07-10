@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
-  Container, Paper, Typography, Grid, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Pagination as MuiPagination, Select, MenuItem
+  Container, Paper, Typography, Grid, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Pagination as MuiPagination, Select, MenuItem, Box
 } from '@mui/material';
 import { notifyError, notifySuccess } from '../components/Notification';
 import { Edit, Delete } from '@mui/icons-material';
 import { createUser, deleteUser, getUsers, updateUser } from '../services/api';
 import { setUsers } from '../store/reducers/userReducer';
 import { selectUsers } from '../selectors/userSelectors';
+import { logoutUser } from '../store/actions/authActions';
 
 const AdminPanel = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const users = useSelector(selectUsers);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -21,8 +24,7 @@ const AdminPanel = () => {
   const fetchUsers = async () => {
     try {
       const response = await getUsers({ page, limit, search });
-      console.log(response.users); // Log response from the API
-      
+      console.log(response.users);
       dispatch(setUsers(response));
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -34,20 +36,19 @@ const AdminPanel = () => {
   }, [page, limit, search]);
 
   useEffect(() => {
-    console.log(users); // Log the updated users state
+    console.log(users);
   }, [users]);
-
 
   const handleCreateOrUpdate = async () => {
     try {
       if (editId) {
         const message = await updateUser(editId, form);
-        console.log(message); // handle message if needed
+        console.log(message);
         notifySuccess(message);
         setEditId(null);
       } else {
         const message = await createUser(form);
-        console.log(message); // handle message if needed
+        console.log(message);
         notifySuccess(message);
       }
       setForm({ firstName: '', lastName: '', email: '', role: 'User', password: '' });
@@ -59,28 +60,42 @@ const AdminPanel = () => {
   };
 
   const handleEdit = (user) => {
-    setForm({ ...user, password: '' }); // Don't pre-fill password on edit
+    setForm({ ...user, password: '' });
     setEditId(user._id);
   };
 
   const handleDelete = async (id) => {
     try {
       const message = await deleteUser(id);
-      console.log(message); // handle message if needed
+      console.log(message);
       notifySuccess(message);
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
-      notifySuccess(error);
+      notifyError(error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser());
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error.message);
     }
   };
 
   return (
     <Container>
-      <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mt={2} mb={2}>
+        <Typography variant="h4" component="h1">
           Admin Panel
         </Typography>
+        <Button onClick={handleLogout} variant="contained" color="secondary">
+          Logout
+        </Button>
+      </Box>
+      <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12}>
             <TextField
@@ -186,7 +201,7 @@ const AdminPanel = () => {
       </TableContainer>
       <Grid container justifyContent="center" style={{ marginTop: '2rem' }}>
         <MuiPagination
-          count={Math.ceil(users.length / limit) || 1} // Ensure the count is at least 1
+          count={Math.ceil(users.length / limit) || 1}
           page={page}
           onChange={(e, value) => setPage(value)}
         />

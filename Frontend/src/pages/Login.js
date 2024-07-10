@@ -1,4 +1,4 @@
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, Grid, Container, Paper, TextField } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom'; // Import Link for navigation
@@ -32,7 +32,8 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <Container>
+    <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }}>
       <h1>Login</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
@@ -71,7 +72,8 @@ const Login = () => {
           </Grid>
         </Grid>
       </form>
-    </div>
+      </Paper>
+    </Container>
   );
 };
 

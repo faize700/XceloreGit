@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import {Container, Paper, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
@@ -27,7 +27,8 @@ const Register = () => {
   };
 
   return (
-    <div>
+    <Container>
+    <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }}>
       <h1>Register</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
@@ -101,7 +102,7 @@ const Register = () => {
           </Grid>
         </Grid>
       </form>
-    </div>
+      </Paper></Container>
   );
 };
 
